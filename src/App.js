@@ -11,6 +11,8 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Pagination from '@material-ui/lab/Pagination';
+import Backdrop from '@material-ui/core/Backdrop';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,6 +27,10 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
+  },
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
   },
   search: {
     position: 'relative',
@@ -79,6 +85,7 @@ function App() {
   });
   const [currentPage,setCurrentPage] = useState(1);
   const [postsPerPage,setPostsPerPage] = useState(10);
+  const [isLoading,setLoading] = useState(true);
   const classes = useStyles();
 
   const categoryChange=(category,check)=>{
@@ -139,6 +146,7 @@ function App() {
     axios.get("https://www.breakingbadapi.com/api/characters").then(res=>{
         setCharacters(res.data);
         setCharactersA(res.data);
+        setLoading(false);
         console.log(res.data);
     })
   },[])
@@ -227,7 +235,10 @@ function App() {
         </Toolbar>
       </AppBar>
     </div>
-      <Test characters={currentCharacters} searchParam={searchParam} detailsToggle={detailsToggle} setDetailsToggle={setDetailsToggle}/>
+      {isLoading&&<Backdrop className={classes.backdrop} open={isLoading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>}
+      {!isLoading&&<Test characters={currentCharacters} searchParam={searchParam} detailsToggle={detailsToggle} setDetailsToggle={setDetailsToggle}/>}
       {!detailsToggle&&<Pagination count={Math.ceil(characters.length/10)} color="primary" onChange={paginationClick}/>}
     </div>
   );
